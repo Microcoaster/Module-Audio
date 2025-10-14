@@ -831,24 +831,46 @@ void sendAudioVolumeUpdate();
       return true;
     }
 
-    // Démarrer la lecture immédiatement
+    // Démarrer la lecture avec FADE-IN anti-pop
+    Serial.println("[AUDIO] 🔇 Démarrage silencieux (anti-pop)...");
+    
+    // Sauvegarder le volume original
+    int originalVolume = volumeLevel;
+    
+    // Commencer à volume 0 pour éviter le pop
+    audio.setVolume(0);
+    
     Serial.println("[AUDIO] 🔄 Tentative de connexion à l'audio...");
     if (audio.connecttoFS(SD, filepath.c_str())) {
       Serial.println("[AUDIO] ✅ Connexion audio réussie");
-      Serial.println("[AUDIO] ▶️ Démarrage de la lecture...");
       isPlaying = true;
       isPaused = false;
       currentAudioFile = filename;
+      
+      // Laisser l'audio se stabiliser
+      delay(50);
+      
+      // FADE-IN progressif pour éviter le pop
+      Serial.println("[AUDIO] 🔊 Fade-in progressif...");
+      for (int vol = 0; vol <= originalVolume; vol += 3) {
+        int audioVolume = map(vol, 0, 100, 0, 63);
+        audio.setVolume(audioVolume);
+        delay(15); // 15ms par step = fade-in fluide
+      }
+      
+      // Volume final exact
+      int finalVolume = map(originalVolume, 0, 100, 0, 63);
+      audio.setVolume(finalVolume);
+      
+      Serial.printf("[AUDIO] ✅ Volume final: %d%% (audio: %d/63)\n", originalVolume, finalVolume);
       sendAudioStatusUpdate();
-
-      // Attendre un peu et vérifier l'état
-      ::delay(100);
-      Serial.printf("[AUDIO] 📊 État après connexion - isPlaying: %s\n", isPlaying ? "true" : "false");
 
       return true;
     } else {
       Serial.println("[AUDIO] ❌ Échec connexion audio");
-      Serial.println("[AUDIO] 🔍 Vérifiez que le fichier existe et est au bon format");
+      // Restaurer le volume en cas d'échec
+      int audioVolume = map(originalVolume, 0, 100, 0, 63);
+      audio.setVolume(audioVolume);
       return false;
     }
   }
@@ -866,21 +888,68 @@ void sendAudioVolumeUpdate();
   void stopAudio() {
     if (!isPlaying && currentAudioFile == "") return;
     
-    Serial.println("[AUDIO] 🛑 Arrêt lecture");
+    Serial.println("[AUDIO] 🛑 FADE-OUT anti-pop avant arrêt...");
+    
+    // Récupérer le volume actuel
+    int currentVolume = volumeLevel;
+    
+    // FADE-OUT progressif pour éviter le pop
+    for (int vol = currentVolume; vol >= 0; vol -= 5) {
+      int audioVolume = map(vol, 0, 100, 0, 63);
+      audio.setVolume(audioVolume);
+      delay(10); // 10ms par step = fade-out rapide mais fluide
+    }
+    
+    // Volume à 0 avant arrêt définitif
+    audio.setVolume(0);
+    delay(20);
+    
+    Serial.println("[AUDIO] 🛑 Arrêt lecture silencieux");
     audio.stopSong();
     isPlaying = false;
     isPaused = false;
     currentAudioFile = "";
     playDelay = 0;
+    
+    // Restaurer le volume pour la prochaine lecture
+    int audioVolume = map(currentVolume, 0, 100, 0, 63);
+    audio.setVolume(audioVolume);
+    
     sendAudioStatusUpdate();
   }
 
   void setVolume(int volume) {
+    int oldVolume = volumeLevel;
     volumeLevel = constrain(volume, 0, 100);
-    // Convertir 0-100 vers 0-63 pour une meilleure résolution de volume
-    int audioVolume = map(volumeLevel, 0, 100, 0, 63);
-    audio.setVolume(audioVolume);
-    Serial.printf("[AUDIO] 🔊 Volume réglé à %d%% (audio: %d/63)\n", volumeLevel, audioVolume);
+    
+    Serial.printf("[AUDIO] 🔊 Changement volume %d%% → %d%%\n", oldVolume, volumeLevel);
+    
+    // Changement de volume progressif anti-crachement
+    int oldAudioVolume = map(oldVolume, 0, 100, 0, 63);
+    int newAudioVolume = map(volumeLevel, 0, 100, 0, 63);
+    
+    // Si la différence est importante, faire une transition douce
+    if (abs(newAudioVolume - oldAudioVolume) > 5) {
+      Serial.println("[AUDIO] 🎛️ Transition volume progressive...");
+      
+      if (newAudioVolume > oldAudioVolume) {
+        // Volume UP progressif
+        for (int vol = oldAudioVolume; vol <= newAudioVolume; vol += 2) {
+          audio.setVolume(vol);
+          delay(8);
+        }
+      } else {
+        // Volume DOWN progressif
+        for (int vol = oldAudioVolume; vol >= newAudioVolume; vol -= 2) {
+          audio.setVolume(vol);
+          delay(8);
+        }
+      }
+    }
+    
+    // Volume final exact
+    audio.setVolume(newAudioVolume);
+    Serial.printf("[AUDIO] ✅ Volume final: %d%% (audio: %d/63)\n", volumeLevel, newAudioVolume);
 
     // Envoyer la mise à jour du volume
     sendAudioVolumeUpdate();
