@@ -29,7 +29,7 @@
 
   // Configuration serveur WebSocket - Basculez entre ws (local) et wss (production)
   #define SERVER_USE_SSL false                       // true = wss (SSL/TLS), false = ws (plain)
-  const char* server_host = "192.168.1.15";        // Adresse IP/domaine du serveur (192.168.1.16 pour local, app.microcoaster.com pour production)
+  const char* server_host = "192.168.1.28";        // Adresse IP/domaine du serveur (192.168.1.16 pour local, app.microcoaster.com pour production)
   const uint16_t server_port = 3000;                 // Port du serveur (3000 pour ws, 443 pour wss)
   const char* websocket_path = "/esp32";             // Endpoint WebSocket dédié aux modules ESP32
   // Empreinte SSL optionnelle (fingerprint SHA1) - laissez vide "" pour ne pas vérifier
@@ -67,10 +67,10 @@
   // Pins I2S pour l'amplificateur MAX98357
   const int I2S_BCLK_PIN = 26;      // GPIO 26 - Bit Clock I2S
   const int I2S_LRC_PIN = 25;       // GPIO 25 - Word Select (WS) I2S
-  const int I2S_DIN_PIN = 27;       // GPIO 27 - Data In I2S
+  const int I2S_DIN_PIN = 22;       // GPIO 22 - Data In I2S
 
-  // Pins SPI pour la carte SD
-  const int SD_CS_PIN = 5;          // GPIO 5 - Chip Select SD
+  // Pins SPI pour la carte SD2
+  const int SD_CS_PIN = 13;          // GPIO 13 - Chip Select SD
   const int SD_MOSI_PIN = 23;       // GPIO 23 - Master Out Slave In
   const int SD_MISO_PIN = 19;       // GPIO 19 - Master In Slave Out
   const int SD_SCK_PIN = 18;        // GPIO 18 - Serial Clock
@@ -343,9 +343,6 @@ void sendAudioVolumeUpdate();
       sendTelemetry();
       lastTelemetry = now;
     }
-    
-    // Pause pour éviter la saturation CPU
-    delay(100);
   }
 
   // ========================================
