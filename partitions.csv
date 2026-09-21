@@ -1,0 +1,16 @@
+# Table de partition du module audio.
+#
+# Les schémas fournis par PlatformIO réservent deux emplacements
+# d'application pour la mise à jour par les airs. Les modules se flashent
+# par USB, l'OTA n'est utilisée nulle part dans le projet : le second
+# emplacement coûtait 1,9 Mo pour rien.
+#
+# Un seul emplacement d'application de 2,6 Mo laisse 1,4 Mo au système de
+# fichiers, largement assez pour les 176 Ko du portail captif.
+#
+# Nom,      Type, SousType, Offset,   Taille,   Drapeaux
+nvs,        data, nvs,      0x9000,   0x5000,
+otadata,    data, ota,      0xe000,   0x2000,
+app0,       app,  ota_0,    0x10000,  0x280000,
+spiffs,     data, spiffs,   0x290000, 0x160000,
+coredump,   data, coredump, 0x3F0000, 0x10000,
