@@ -123,7 +123,7 @@ void sendAudioVolumeUpdate();
     Serial.begin(115200);
     Serial.println();
     Serial.println("=========================================");
-    Serial.println("🚀 MicroCoaster - Audio v0.0.0");
+    Serial.println("MicroCoaster - Audio v0.0.0");
     Serial.println("=========================================");
     Serial.println();
 
@@ -136,7 +136,7 @@ void sendAudioVolumeUpdate();
     pinMode(STATUS_LED_PIN, OUTPUT);
     digitalWrite(STATUS_LED_PIN, LOW); // Éteint au démarrage
     
-    Serial.println("[AUDIO] 📍 Configuration hardware...");
+    Serial.println("[AUDIO]  Configuration hardware...");
     Serial.println("   ├─ LED statut: GPIO " + String(STATUS_LED_PIN));
     Serial.println("   ├─ I2S BCLK: GPIO " + String(I2S_BCLK_PIN));
     Serial.println("   ├─ I2S LRC: GPIO " + String(I2S_LRC_PIN));
@@ -146,28 +146,28 @@ void sendAudioVolumeUpdate();
 
     // *** INITIALISATION CARTE SD ***
     
-    Serial.println("[AUDIO] 💾 Initialisation carte SD...");
+    Serial.println("[AUDIO]  Initialisation carte SD...");
     if (initSDCard()) {
-      Serial.println("[AUDIO] ✅ Carte SD initialisée");
+      Serial.println("[AUDIO] [OK] Carte SD initialisée");
       scanAudioFiles();
     } else {
-      Serial.println("[AUDIO] ❌ Échec initialisation carte SD");
+      Serial.println("[AUDIO] [ERREUR] Échec initialisation carte SD");
     }
 
     // *** INITIALISATION AUDIO I2S ***
     
-    Serial.println("[AUDIO] 🔊 Initialisation système audio...");
+    Serial.println("[AUDIO]  Initialisation système audio...");
     if (initAudio()) {
-      Serial.println("[AUDIO] ✅ Système audio initialisé");
+      Serial.println("[AUDIO] [OK] Système audio initialisé");
       setVolume(volumeLevel);
     } else {
-      Serial.println("[AUDIO] ❌ Échec initialisation système audio");
+      Serial.println("[AUDIO] [ERREUR] Échec initialisation système audio");
     }
 
     // *** CONFIGURATION DU GESTIONNAIRE WIFI ***
     
     // Configuration du point d'accès de secours (fallback)
-    Serial.println("📡 Configuration du point d'accès de secours...");
+    Serial.println("Configuration du point d'accès de secours...");
     wifi.setAPCredentials(ESP_WIFI_SSID, ESP_WIFI_PASSWORD);
     Serial.print("   ├─ SSID: ");
     Serial.println(ESP_WIFI_SSID);
@@ -175,7 +175,7 @@ void sendAudioVolumeUpdate();
     Serial.println(ESP_WIFI_PASSWORD);
     
     // Configuration des timeouts du portail captif
-    Serial.println("⏱️  Configuration des timeouts...");
+    Serial.println("Configuration des timeouts...");
     wifi.setPortalTimeout(3600);     // 60 minutes (très long pour debug)
     wifi.setAPClientCheck(true);     // Ne pas fermer si des clients sont connectés
     wifi.setWebClientCheck(true);    // Chaque requête HTTP remet à zéro le timer
@@ -184,7 +184,7 @@ void sendAudioVolumeUpdate();
     Serial.println("   └─ Vérification requêtes web: activée");
     
     // Configuration avancée du portail captif
-    Serial.println("🔧 Configuration avancée...");
+    Serial.println("Configuration avancée...");
     wifi.setCaptivePortal(true);      // Activer les redirections pour portail captif
     Serial.println("   ├─ Portail captif: activé");
     
@@ -196,17 +196,17 @@ void sendAudioVolumeUpdate();
     
     // Protection des fichiers critiques (empêche leur suppression accidentelle)
     wifi.setProtectedJsons({"/wifi.json"});  // Protège le fichier de configuration WiFi
-    Serial.println("🛡️  Protection fichiers: /wifi.json");
+    Serial.println("Protection fichiers: /wifi.json");
     
     // ear*** INITIALISATION DU WIFI MANAGER ***
     
     Serial.println();
-    Serial.println("🔄 Initialisation du WiFi Manager...");
+    Serial.println("Initialisation du WiFi Manager...");
     wifi.begin();  // Monte le système de fichiers, charge /wifi.json si présent
-    Serial.println("💾 Système de fichiers LittleFS monté");
-    Serial.println("📁 Recherche du fichier de configuration /wifi.json...");
+    Serial.println("Système de fichiers LittleFS monté");
+    Serial.println("Recherche du fichier de configuration /wifi.json...");
     
-    Serial.println("🌐 Tentative de connexion WiFi...");
+    Serial.println("Tentative de connexion WiFi...");
     wifi.run();    // Essaie de se connecter en STA; si ça échoue, applique la politique de fallback
     
     // Vérification du statut après initialisation
@@ -215,22 +215,22 @@ void sendAudioVolumeUpdate();
     // *** VÉRIFICATION ÉTAT CONNEXION ***
     
     if (wifi.isConnected()) {
-      Serial.println("✅ Connexion WiFi réussie !");
-      Serial.println("📡 IP: " + WiFi.localIP().toString());
-      Serial.println("🌐 Mode: Client WiFi (STA)");
+      Serial.println("[OK] Connexion WiFi réussie !");
+      Serial.println("IP: " + WiFi.localIP().toString());
+      Serial.println("Mode: Client WiFi (STA)");
       
       // Connexion WebSocket automatique après succès WiFi
       connectSocket();
     } else {
-      Serial.println("⚠️  Connexion WiFi échouée");
-      Serial.println("🔧 Ouverture du portail de configuration...");
-      Serial.println("📡 Point d'accès: WifiManager-MicroCoaster");
-      Serial.println("🌐 IP du portail: 192.168.4.1");
-      Serial.println("🔗 Connectez-vous au WiFi puis allez sur http://192.168.4.1");
+      Serial.println("[!] Connexion WiFi échouée");
+      Serial.println("Ouverture du portail de configuration...");
+      Serial.println("Point d'accès: WifiManager-MicroCoaster");
+      Serial.println("IP du portail: 192.168.4.1");
+      Serial.println("Connectez-vous au WiFi puis allez sur http://192.168.4.1");
     }
     
     Serial.println();
-    Serial.println("✅ Initialisation terminée !");
+    Serial.println("[OK] Initialisation terminée !");
     Serial.println("=========================================");
   }
 
@@ -258,20 +258,20 @@ void sendAudioVolumeUpdate();
       
       // Affichage du statut de connexion
       if (currentState) {
-        Serial.println("🟢 WiFi connecté - IP: " + WiFi.localIP().toString() + 
+        Serial.println("[UP] WiFi connecté - IP: " + WiFi.localIP().toString() + 
                       " | Signal: " + String(WiFi.RSSI()) + " dBm");
       } else {
-        Serial.println("🔴 WiFi déconnecté - Portail de configuration actif sur 192.168.4.1");
+        Serial.println("[DOWN] WiFi déconnecté - Portail de configuration actif sur 192.168.4.1");
       }
       
       // Détection des changements d'état WiFi pour actions automatiques
       if (currentState != lastConnectionState) {
         if (currentState) {
-          Serial.println("🎉 Connexion WiFi établie !");
+          Serial.println("Connexion WiFi établie !");
           // Reconnexion WebSocket automatique après retour WiFi
           connectSocket();
         } else {
-          Serial.println("⚠️  Connexion WiFi perdue, basculement en mode portail...");
+          Serial.println("[!] Connexion WiFi perdue, basculement en mode portail...");
           // Reset de l'authentification et arrêt audio
           isAuthenticated = false;
           stopAudio();
@@ -287,9 +287,9 @@ void sendAudioVolumeUpdate();
     if (sdCardMounted && playDelay > 0 && millis() >= playDelay) {
       // Démarrer la lecture après le délai
       String filepath = "/" + currentAudioFile;
-      Serial.println("[AUDIO] 🔄 Tentative de connexion à l'audio après délai...");
+      Serial.println("[AUDIO]  Tentative de connexion à l'audio après délai...");
       if (audio.connecttoFS(SD, filepath.c_str())) {
-        Serial.println("[AUDIO] ✅ Lecture démarrée après délai");
+        Serial.println("[AUDIO] [OK] Lecture démarrée après délai");
         Serial.println("[AUDIO] ▶️ Démarrage de la lecture...");
         isPlaying = true;
         updateStatusLED();
@@ -297,9 +297,9 @@ void sendAudioVolumeUpdate();
 
         // Attendre un peu et vérifier l'état
         ::delay(100);
-        Serial.printf("[AUDIO] 📊 État après délai - isPlaying: %s\n", isPlaying ? "true" : "false");
+        Serial.printf("[AUDIO]  État après délai - isPlaying: %s\n", isPlaying ? "true" : "false");
       } else {
-        Serial.println("[AUDIO] ❌ Échec démarrage lecture après délai");
+        Serial.println("[AUDIO] [ERREUR] Échec démarrage lecture après délai");
         currentAudioFile = "";
       }
       playDelay = 0;
@@ -313,7 +313,7 @@ void sendAudioVolumeUpdate();
     if (millis() - lastAudioDebug > 2000) {  // Toutes les 2 secondes
       lastAudioDebug = millis();
       if (isPlaying) {
-        Serial.println("[AUDIO] 🔊 Audio en cours - vérification...");
+        Serial.println("[AUDIO]  Audio en cours - vérification...");
       }
     }
     
@@ -325,7 +325,7 @@ void sendAudioVolumeUpdate();
     if (millis() - lastWebSocketCheck > 10000) {  // Toutes les 10 secondes
       lastWebSocketCheck = millis();
       if (!webSocket.isConnected() && isAuthenticated) {
-        Serial.println("[AUDIO] ⚠️  Connexion WebSocket perdue - Reset de l'authentification");
+        Serial.println("[AUDIO] [!] Connexion WebSocket perdue - Reset de l'authentification");
         isAuthenticated = false;
         digitalWrite(STATUS_LED_PIN, LOW);
         connectSocket();
@@ -351,50 +351,50 @@ void sendAudioVolumeUpdate();
 
   // Établit la connexion WebSocket avec le serveur (ws ou wss selon configuration)
   void connectSocket() {
-    Serial.println("[WEBSOCKET] 🔗 Connexion WebSocket...");
+    Serial.println("[WEBSOCKET]  Connexion WebSocket...");
 
     // Vérification préalable de la connexion WiFi
     if (!wifi.isConnected()) {
-      Serial.println("[WEBSOCKET] ⚠️  WiFi non connecté - Annulation connexion WebSocket");
+      Serial.println("[WEBSOCKET] [!] WiFi non connecté - Annulation connexion WebSocket");
       return;
     }
 
-    Serial.println("[WEBSOCKET] 📍 Module ID: " + MODULE_ID);
-    Serial.println("[WEBSOCKET] 🔑 Password: " + MODULE_PASSWORD.substring(0, 8) + "...");
+    Serial.println("[WEBSOCKET]  Module ID: " + MODULE_ID);
+    Serial.println("[WEBSOCKET]  Password: " + MODULE_PASSWORD.substring(0, 8) + "...");
 
     // Configuration de la connexion WebSocket selon le flag SSL
     #if SERVER_USE_SSL
-      Serial.println("[WEBSOCKET] 🔒 Mode: WSS (SSL/TLS activé)");
+      Serial.println("[WEBSOCKET]  Mode: WSS (SSL/TLS activé)");
       if (strlen(server_fingerprint) > 0) {
-        Serial.println("[WEBSOCKET] 🔐 Vérification empreinte SSL activée");
+        Serial.println("[WEBSOCKET]  Vérification empreinte SSL activée");
         webSocket.beginSSL(server_host, server_port, websocket_path, server_fingerprint);
       } else {
-        Serial.println("[WEBSOCKET] ⚠️  Vérification empreinte SSL désactivée (non recommandé en production)");
+        Serial.println("[WEBSOCKET] [!] Vérification empreinte SSL désactivée (non recommandé en production)");
         webSocket.beginSSL(server_host, server_port, websocket_path);
       }
-      Serial.printf("[WEBSOCKET] 🤖 WebSocket: wss://%s:%d%s\n", server_host, server_port, websocket_path);
+      Serial.printf("[WEBSOCKET]  WebSocket: wss://%s:%d%s\n", server_host, server_port, websocket_path);
     #else
-      Serial.println("[WEBSOCKET] 🔓 Mode: WS (plain, sans SSL)");
+      Serial.println("[WEBSOCKET]  Mode: WS (plain, sans SSL)");
       webSocket.begin(server_host, server_port, websocket_path);
-      Serial.printf("[WEBSOCKET] 🤖 WebSocket: ws://%s:%d%s\n", server_host, server_port, websocket_path);
+      Serial.printf("[WEBSOCKET]  WebSocket: ws://%s:%d%s\n", server_host, server_port, websocket_path);
     #endif
 
     webSocket.onEvent(webSocketEvent);           // Gestionnaire d'événements
     webSocket.setReconnectInterval(3000);        // Reconnexion automatique toutes les 3s (réduit)
     webSocket.enableHeartbeat(30000, 10000, 3);  // Heartbeat WebSocket: 30s interval, 10s timeout, 3 essais (plus long)
 
-    Serial.println("[WEBSOCKET] ✅ ESP32 Audio prêt (Configuration optimisée)!");
+    Serial.println("[WEBSOCKET] [OK] ESP32 Audio prêt (Configuration optimisée)!");
   }
 
   void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
     switch(type) {
       case WStype_CONNECTED:
-        Serial.println("[AUDIO] 🟢 Connecté au serveur WebSocket");
+        Serial.println("[AUDIO] [UP] Connecté au serveur WebSocket");
         authenticateModule();
         break;
         
       case WStype_DISCONNECTED:
-        Serial.println("[AUDIO] 🔴 Déconnexion du serveur - Tentative de reconnexion immédiate");
+        Serial.println("[AUDIO] [DOWN] Déconnexion du serveur - Tentative de reconnexion immédiate");
         isAuthenticated = false;
         stopAudio();
         digitalWrite(STATUS_LED_PIN, LOW);
@@ -404,7 +404,7 @@ void sendAudioVolumeUpdate();
         break;
         
       case WStype_TEXT: {
-        Serial.println("[AUDIO] 📡 Message reçu: " + String((char*)payload));
+        Serial.println("[AUDIO]  Message reçu: " + String((char*)payload));
         
         JsonDocument doc;
         deserializeJson(doc, (char*)payload);
@@ -420,8 +420,8 @@ void sendAudioVolumeUpdate();
         } else if (msgType == "error") {
           handleError((char*)payload);
         } else {
-          Serial.println("[AUDIO] ⚠️ Événement non géré: '" + msgType + "'");
-          Serial.println("[AUDIO] 🔍 Message complet: " + String((char*)payload));
+          Serial.println("[AUDIO] [!] Événement non géré: '" + msgType + "'");
+          Serial.println("[AUDIO]  Message complet: " + String((char*)payload));
         }
         break;
       }
@@ -432,7 +432,7 @@ void sendAudioVolumeUpdate();
   }
 
   void authenticateModule() {
-    Serial.println("[AUDIO] 🔐 Authentification WebSocket natif...");
+    Serial.println("[AUDIO]  Authentification WebSocket natif...");
     
     // Format WebSocket natif
     JsonDocument authData;
@@ -451,11 +451,11 @@ void sendAudioVolumeUpdate();
     serializeJson(authData, authMessage);
     webSocket.sendTXT(authMessage);
     
-    Serial.println("[AUDIO] 📤 Authentification envoyée: " + authMessage);
+    Serial.println("[AUDIO]  Authentification envoyée: " + authMessage);
   }
 
   void handleConnected(const char* payload) {
-    Serial.println("[AUDIO] ✅ Module authentifié WebSocket natif");
+    Serial.println("[AUDIO] [OK] Module authentifié WebSocket natif");
     
     isAuthenticated = true;
     updateStatusLED();
@@ -470,7 +470,7 @@ void sendAudioVolumeUpdate();
 
   void handleCommand(const char* payload) {
     if (!isAuthenticated) {
-      Serial.println("[AUDIO] ⚠️ Commande refusée - non authentifié");
+      Serial.println("[AUDIO] [!] Commande refusée - non authentifié");
       return;
     }
     
@@ -479,7 +479,7 @@ void sendAudioVolumeUpdate();
     deserializeJson(doc, payload);
     
     String command = doc["data"]["command"];
-    Serial.println("[AUDIO] 🎮 Commande reçue: " + command);
+    Serial.println("[AUDIO]  Commande reçue: " + command);
     
     String status = "success";
     String message = "";
@@ -490,15 +490,15 @@ void sendAudioVolumeUpdate();
       
     } else if (command == "audio_play") {
       if (!doc["data"]["params"]["filename"].is<String>()) {
-        Serial.println("[AUDIO] ❌ Filename manquant ou invalide");
+        Serial.println("[AUDIO] [ERREUR] Filename manquant ou invalide");
         status = "error";
         message = "Nom de fichier manquant";
       } else {
         String filename = doc["data"]["params"]["filename"];
-        Serial.println("[AUDIO] 📁 Filename reçu: '" + filename + "'");
+        Serial.println("[AUDIO]  Filename reçu: '" + filename + "'");
         unsigned long delay_ms = doc["data"]["params"]["delay"].is<unsigned long>() ? doc["data"]["params"]["delay"].as<unsigned long>() : 0;
         if (filename.length() == 0) {
-          Serial.println("[AUDIO] ❌ Filename vide");
+          Serial.println("[AUDIO] [ERREUR] Filename vide");
           status = "error";
           message = "Nom de fichier vide";
         } else if (playAudioFile(filename, delay_ms)) {
@@ -519,7 +519,7 @@ void sendAudioVolumeUpdate();
       
     } else if (command == "audio_volume") {
       if (!doc["data"]["params"]["level"].is<int>()) {
-        Serial.println("[AUDIO] ❌ Level de volume manquant ou invalide");
+        Serial.println("[AUDIO] [ERREUR] Level de volume manquant ou invalide");
         status = "error";
         message = "Niveau de volume manquant";
       } else {
@@ -542,7 +542,7 @@ void sendAudioVolumeUpdate();
     //   return; // Ne pas envoyer de réponse pour l'upload
       
     } else {
-      Serial.println("[AUDIO] ❌ Commande inconnue: " + command);
+      Serial.println("[AUDIO] [ERREUR] Commande inconnue: " + command);
       status = "unknown_command";
       message = "Commande inconnue: " + command;
     }
@@ -552,11 +552,11 @@ void sendAudioVolumeUpdate();
     // Envoyer la réponse de commande
     sendCommandResponse(command, status, message);
     
-    Serial.println("[AUDIO] ✅ Commande exécutée: " + message);
+    Serial.println("[AUDIO] [OK] Commande exécutée: " + message);
   }
 
   void handlePing(const char* payload) {
-    Serial.println("[AUDIO] 🏓 Ping reçu du serveur - Envoi du pong");
+    Serial.println("[AUDIO]  Ping reçu du serveur - Envoi du pong");
 
     // Parse du ping pour récupérer le timestamp
     JsonDocument doc;
@@ -573,11 +573,11 @@ void sendAudioVolumeUpdate();
     serializeJson(pongDoc, pongMessage);
     webSocket.sendTXT(pongMessage);
 
-    Serial.println("[AUDIO] 🏓 Pong envoyé: " + pongMessage);
+    Serial.println("[AUDIO]  Pong envoyé: " + pongMessage);
   }
 
   void handleError(const char* payload) {
-    Serial.println("[AUDIO] ❌ Erreur reçue du serveur");
+    Serial.println("[AUDIO] [ERREUR] Erreur reçue du serveur");
     
     isAuthenticated = false;
     stopAudio();
@@ -597,13 +597,13 @@ void sendAudioVolumeUpdate();
   // ========================================
 
   bool initSDCard() {
-    Serial.println("[AUDIO] 💾 Initialisation SD card...");
+    Serial.println("[AUDIO]  Initialisation SD card...");
     
     // Configuration des pins SPI pour la SD
     SPI.begin(SD_SCK_PIN, SD_MISO_PIN, SD_MOSI_PIN);
     
     if (!SD.begin(SD_CS_PIN)) {
-      Serial.println("[AUDIO] ❌ Échec montage SD");
+      Serial.println("[AUDIO] [ERREUR] Échec montage SD");
       sdCardMounted = false;
       return false;
     }
@@ -611,7 +611,7 @@ void sendAudioVolumeUpdate();
     // Vérifier si la carte est accessible
     uint8_t cardType = SD.cardType();
     if (cardType == CARD_NONE) {
-      Serial.println("[AUDIO] ❌ Aucune carte SD détectée");
+      Serial.println("[AUDIO] [ERREUR] Aucune carte SD détectée");
       SD.end();
       sdCardMounted = false;
       return false;
@@ -619,14 +619,14 @@ void sendAudioVolumeUpdate();
     
     // Afficher les informations de la carte
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-    Serial.printf("[AUDIO] ✅ Carte SD détectée - Taille: %llu MB\n", cardSize);
+    Serial.printf("[AUDIO] [OK] Carte SD détectée - Taille: %llu MB\n", cardSize);
     
     sdCardMounted = true;
     return true;
   }
 
   bool initAudio() {
-    Serial.println("[AUDIO] 🔊 Initialisation système audio I2S...");
+    Serial.println("[AUDIO]  Initialisation système audio I2S...");
 
     // Configuration I2S pour MAX98357 avec paramètres optimaux
     audio.setPinout(I2S_BCLK_PIN, I2S_LRC_PIN, I2S_DIN_PIN);
@@ -637,22 +637,22 @@ void sendAudioVolumeUpdate();
     int initialAudioVolume = map(volumeLevel, 0, 100, 0, 63);
     audio.setVolume(initialAudioVolume);
 
-    Serial.printf("[AUDIO] ✅ Système audio I2S configuré - Volume initial: %d%% (audio: %d/63)\n", volumeLevel, initialAudioVolume);
-    Serial.println("[AUDIO] 📊 Configuration: Pas de MCLK (MAX98357)");
+    Serial.printf("[AUDIO] [OK] Système audio I2S configuré - Volume initial: %d%% (audio: %d/63)\n", volumeLevel, initialAudioVolume);
+    Serial.println("[AUDIO]  Configuration: Pas de MCLK (MAX98357)");
     return true;
   }
 
   void scanAudioFiles() {
     if (!sdCardMounted) {
-      Serial.println("[AUDIO] ⚠️ Scan annulé - SD non montée");
+      Serial.println("[AUDIO] [!] Scan annulé - SD non montée");
       return;
     }
 
-    Serial.println("[AUDIO] 🔍 Scan des fichiers audio...");
+    Serial.println("[AUDIO]  Scan des fichiers audio...");
 
     File root = SD.open("/");
     if (!root) {
-      Serial.println("[AUDIO] ❌ Impossible d'ouvrir le répertoire racine");
+      Serial.println("[AUDIO] [ERREUR] Impossible d'ouvrir le répertoire racine");
       return;
     }
 
@@ -664,7 +664,7 @@ void sendAudioVolumeUpdate();
         String filename = file.name();
         if (filename.endsWith(".mp3") || filename.endsWith(".MP3") ||
             filename.endsWith(".wav") || filename.endsWith(".WAV")) {
-          Serial.println("[AUDIO] 📁 Fichier audio trouvé: " + filename);
+          Serial.println("[AUDIO]  Fichier audio trouvé: " + filename);
 
           // Analyser les propriétés du fichier selon le type
           if (filename.endsWith(".mp3") || filename.endsWith(".MP3")) {
@@ -679,11 +679,11 @@ void sendAudioVolumeUpdate();
       file = root.openNextFile();
     }
 
-    Serial.printf("[AUDIO] ✅ Scan terminé - %d fichiers audio trouvés\n", audioCount);
+    Serial.printf("[AUDIO] [OK] Scan terminé - %d fichiers audio trouvés\n", audioCount);
 
     // Conseils pour la qualité audio
     if (audioCount > 0) {
-      Serial.println("[AUDIO] 💡 Conseils qualité audio:");
+      Serial.println("[AUDIO]  Conseils qualité audio:");
       Serial.println("   ├─ MP3: Utilisez des MP3 encodés en haute qualité (320kbps)");
       Serial.println("   ├─ WAV: 16-bit PCM, 44.1kHz ou 48kHz recommandés");
       Serial.println("   ├─ Privilégiez les fichiers stéréo");
@@ -694,21 +694,21 @@ void sendAudioVolumeUpdate();
   void analyzeWavFile(const String& filename) {
     File wavFile = SD.open("/" + filename, FILE_READ);
     if (!wavFile) {
-      Serial.println("[AUDIO] ⚠️ Impossible d'analyser: " + filename);
+      Serial.println("[AUDIO] [!] Impossible d'analyser: " + filename);
       return;
     }
 
     // Lire l'en-tête WAV (44 octets)
     uint8_t header[44];
     if (wavFile.read(header, 44) != 44) {
-      Serial.println("[AUDIO] ⚠️ En-tête WAV invalide: " + filename);
+      Serial.println("[AUDIO] [!] En-tête WAV invalide: " + filename);
       wavFile.close();
       return;
     }
 
     // Vérifier le format WAV
     if (header[0] != 'R' || header[1] != 'I' || header[2] != 'F' || header[3] != 'F') {
-      Serial.println("[AUDIO] ⚠️ Pas un fichier WAV valide: " + filename);
+      Serial.println("[AUDIO] [!] Pas un fichier WAV valide: " + filename);
       wavFile.close();
       return;
     }
@@ -718,15 +718,15 @@ void sendAudioVolumeUpdate();
     uint16_t bitsPerSample = (header[34] | (header[35] << 8));
     uint16_t numChannels = (header[22] | (header[23] << 8));
 
-    Serial.printf("[AUDIO] 📊 %s: %dHz, %d-bit, %d canal(s)\n",
+    Serial.printf("[AUDIO]  %s: %dHz, %d-bit, %d canal(s)\n",
                  filename.c_str(), sampleRate, bitsPerSample, numChannels);
 
     // Vérifications de qualité
     if (bitsPerSample != 16) {
-      Serial.println("[AUDIO] ⚠️ Recommandé: 16-bit PCM pour une meilleure qualité");
+      Serial.println("[AUDIO] [!] Recommandé: 16-bit PCM pour une meilleure qualité");
     }
     if (sampleRate < 44100) {
-      Serial.println("[AUDIO] ⚠️ Faible fréquence d'échantillonnage détectée");
+      Serial.println("[AUDIO] [!] Faible fréquence d'échantillonnage détectée");
     }
     if (numChannels != 2) {
       Serial.println("[AUDIO] ℹ️ Fichier mono détecté (stéréo recommandé)");
@@ -738,14 +738,14 @@ void sendAudioVolumeUpdate();
   void analyzeMp3File(const String& filename) {
     File mp3File = SD.open("/" + filename, FILE_READ);
     if (!mp3File) {
-      Serial.println("[AUDIO] ⚠️ Impossible d'analyser: " + filename);
+      Serial.println("[AUDIO] [!] Impossible d'analyser: " + filename);
       return;
     }
 
     // Lire l'en-tête MP3 (premiers 10 octets pour vérifier le format)
     uint8_t header[10];
     if (mp3File.read(header, 10) != 10) {
-      Serial.println("[AUDIO] ⚠️ En-tête MP3 invalide: " + filename);
+      Serial.println("[AUDIO] [!] En-tête MP3 invalide: " + filename);
       mp3File.close();
       return;
     }
@@ -755,31 +755,31 @@ void sendAudioVolumeUpdate();
     if (header[0] == 'I' && header[1] == 'D' && header[2] == '3') {
       // Fichier avec tag ID3
       isValidMp3 = true;
-      Serial.println("[AUDIO] 📊 " + filename + ": MP3 avec tag ID3 détecté");
+      Serial.println("[AUDIO]  " + filename + ": MP3 avec tag ID3 détecté");
     } else if ((header[0] & 0xFF) == 0xFF && (header[1] & 0xE0) == 0xE0) {
       // Frame sync MP3 direct
       isValidMp3 = true;
-      Serial.println("[AUDIO] 📊 " + filename + ": MP3 sans tag ID3 détecté");
+      Serial.println("[AUDIO]  " + filename + ": MP3 sans tag ID3 détecté");
     }
 
     if (!isValidMp3) {
-      Serial.println("[AUDIO] ⚠️ Format MP3 non reconnu: " + filename);
+      Serial.println("[AUDIO] [!] Format MP3 non reconnu: " + filename);
     }
 
     // Obtenir la taille du fichier
     uint32_t fileSize = mp3File.size();
-    Serial.printf("[AUDIO] 📊 Taille: %d bytes\n", fileSize);
+    Serial.printf("[AUDIO]  Taille: %d bytes\n", fileSize);
 
     mp3File.close();
   }
 
   void sendAudioFileList() {
     if (!isAuthenticated || !sdCardMounted) {
-      Serial.println("[AUDIO] ⚠️ Envoi liste annulé - non authentifié ou SD non montée");
+      Serial.println("[AUDIO] [!] Envoi liste annulé - non authentifié ou SD non montée");
       return;
     }
     
-    Serial.println("[AUDIO] 📤 Envoi liste des fichiers audio...");
+    Serial.println("[AUDIO]  Envoi liste des fichiers audio...");
     
     JsonDocument doc;
     doc["type"] = "audio_list_response";
@@ -807,12 +807,12 @@ void sendAudioVolumeUpdate();
     serializeJson(doc, message);
     webSocket.sendTXT(message);
     
-    Serial.printf("[AUDIO] 📤 Liste envoyée - %d fichiers\n", files.size());
+    Serial.printf("[AUDIO]  Liste envoyée - %d fichiers\n", files.size());
   }
 
   bool playAudioFile(const String& filename, unsigned long delay_ms) {
     if (!sdCardMounted) {
-      Serial.println("[AUDIO] ❌ Lecture annulée - SD non montée");
+      Serial.println("[AUDIO] [ERREUR] Lecture annulée - SD non montée");
       return false;
     }
 
@@ -822,17 +822,17 @@ void sendAudioVolumeUpdate();
     }
 
     String filepath = "/" + filename;
-    Serial.println("[AUDIO] 🎵 Démarrage lecture: " + filepath);
+    Serial.println("[AUDIO]  Démarrage lecture: " + filepath);
 
     if (delay_ms > 0) {
-      Serial.printf("[AUDIO] ⏱️ Délai avant lecture: %lu ms\n", delay_ms);
+      Serial.printf("[AUDIO]  Délai avant lecture: %lu ms\n", delay_ms);
       playDelay = millis() + delay_ms;
       currentAudioFile = filename;
       return true;
     }
 
     // Démarrer la lecture avec FADE-IN anti-pop
-    Serial.println("[AUDIO] 🔇 Démarrage silencieux (anti-pop)...");
+    Serial.println("[AUDIO]  Démarrage silencieux (anti-pop)...");
     
     // Sauvegarder le volume original
     int originalVolume = volumeLevel;
@@ -840,9 +840,9 @@ void sendAudioVolumeUpdate();
     // Commencer à volume 0 pour éviter le pop
     audio.setVolume(0);
     
-    Serial.println("[AUDIO] 🔄 Tentative de connexion à l'audio...");
+    Serial.println("[AUDIO]  Tentative de connexion à l'audio...");
     if (audio.connecttoFS(SD, filepath.c_str())) {
-      Serial.println("[AUDIO] ✅ Connexion audio réussie");
+      Serial.println("[AUDIO] [OK] Connexion audio réussie");
       isPlaying = true;
       isPaused = false;
       currentAudioFile = filename;
@@ -851,7 +851,7 @@ void sendAudioVolumeUpdate();
       delay(50);
       
       // FADE-IN progressif pour éviter le pop
-      Serial.println("[AUDIO] 🔊 Fade-in progressif...");
+      Serial.println("[AUDIO]  Fade-in progressif...");
       for (int vol = 0; vol <= originalVolume; vol += 3) {
         int audioVolume = map(vol, 0, 100, 0, 63);
         audio.setVolume(audioVolume);
@@ -862,12 +862,12 @@ void sendAudioVolumeUpdate();
       int finalVolume = map(originalVolume, 0, 100, 0, 63);
       audio.setVolume(finalVolume);
       
-      Serial.printf("[AUDIO] ✅ Volume final: %d%% (audio: %d/63)\n", originalVolume, finalVolume);
+      Serial.printf("[AUDIO] [OK] Volume final: %d%% (audio: %d/63)\n", originalVolume, finalVolume);
       sendAudioStatusUpdate();
 
       return true;
     } else {
-      Serial.println("[AUDIO] ❌ Échec connexion audio");
+      Serial.println("[AUDIO] [ERREUR] Échec connexion audio");
       // Restaurer le volume en cas d'échec
       int audioVolume = map(originalVolume, 0, 100, 0, 63);
       audio.setVolume(audioVolume);
@@ -878,7 +878,7 @@ void sendAudioVolumeUpdate();
   void pauseAudio() {
     if (!isPlaying) return;
     
-    Serial.println("[AUDIO] ⏸️ Mise en pause");
+    Serial.println("[AUDIO]  Mise en pause");
     audio.pauseResume();
     isPlaying = false;
     isPaused = true;
@@ -888,7 +888,7 @@ void sendAudioVolumeUpdate();
   void stopAudio() {
     if (!isPlaying && currentAudioFile == "") return;
     
-    Serial.println("[AUDIO] 🛑 FADE-OUT anti-pop avant arrêt...");
+    Serial.println("[AUDIO] [STOP] FADE-OUT anti-pop avant arrêt...");
     
     // Récupérer le volume actuel
     int currentVolume = volumeLevel;
@@ -904,7 +904,7 @@ void sendAudioVolumeUpdate();
     audio.setVolume(0);
     delay(20);
     
-    Serial.println("[AUDIO] 🛑 Arrêt lecture silencieux");
+    Serial.println("[AUDIO] [STOP] Arrêt lecture silencieux");
     audio.stopSong();
     isPlaying = false;
     isPaused = false;
@@ -922,7 +922,7 @@ void sendAudioVolumeUpdate();
     int oldVolume = volumeLevel;
     volumeLevel = constrain(volume, 0, 100);
     
-    Serial.printf("[AUDIO] 🔊 Changement volume %d%% → %d%%\n", oldVolume, volumeLevel);
+    Serial.printf("[AUDIO]  Changement volume %d%%  %d%%\n", oldVolume, volumeLevel);
     
     // Changement de volume progressif anti-crachement
     int oldAudioVolume = map(oldVolume, 0, 100, 0, 63);
@@ -930,7 +930,7 @@ void sendAudioVolumeUpdate();
     
     // Si la différence est importante, faire une transition douce
     if (abs(newAudioVolume - oldAudioVolume) > 5) {
-      Serial.println("[AUDIO] 🎛️ Transition volume progressive...");
+      Serial.println("[AUDIO]  Transition volume progressive...");
       
       if (newAudioVolume > oldAudioVolume) {
         // Volume UP progressif
@@ -949,7 +949,7 @@ void sendAudioVolumeUpdate();
     
     // Volume final exact
     audio.setVolume(newAudioVolume);
-    Serial.printf("[AUDIO] ✅ Volume final: %d%% (audio: %d/63)\n", volumeLevel, newAudioVolume);
+    Serial.printf("[AUDIO] [OK] Volume final: %d%% (audio: %d/63)\n", volumeLevel, newAudioVolume);
 
     // Envoyer la mise à jour du volume
     sendAudioVolumeUpdate();
@@ -976,7 +976,7 @@ void sendAudioVolumeUpdate();
     serializeJson(doc, responseMessage);
     webSocket.sendTXT(responseMessage);
     
-    Serial.printf("[AUDIO] 📤 Réponse: %s -> %s\n", command.c_str(), status.c_str());
+    Serial.printf("[AUDIO]  Réponse: %s -> %s\n", command.c_str(), status.c_str());
   }
 
   void sendHeartbeat() {
@@ -984,11 +984,11 @@ void sendAudioVolumeUpdate();
 
     // Vérification de la mémoire disponible
     uint32_t freeHeap = ESP.getFreeHeap();
-    Serial.printf("[AUDIO] 💾 Mémoire libre: %d bytes\n", freeHeap);
+    Serial.printf("[AUDIO]  Mémoire libre: %d bytes\n", freeHeap);
 
     // Alerte si mémoire faible
     if (freeHeap < 50000) {  // Moins de 50KB libre
-      Serial.println("[AUDIO] ⚠️  Mémoire faible détectée !");
+      Serial.println("[AUDIO] [!] Mémoire faible détectée !");
     }
 
     JsonDocument doc;
@@ -1008,7 +1008,7 @@ void sendAudioVolumeUpdate();
     serializeJson(doc, message);
     webSocket.sendTXT(message);
 
-    Serial.println("[AUDIO] 💓 Heartbeat envoyé");
+    Serial.println("[AUDIO]  Heartbeat envoyé");
   }void sendTelemetry() {
     if (!isAuthenticated) return;
     
@@ -1028,7 +1028,7 @@ void sendAudioVolumeUpdate();
     serializeJson(doc, message);
     webSocket.sendTXT(message);
     
-    Serial.println("[AUDIO] 📊 Télémétrie envoyée");
+    Serial.println("[AUDIO]  Télémétrie envoyée");
   }
 
   void sendAudioStatusUpdate() {
@@ -1047,7 +1047,7 @@ void sendAudioVolumeUpdate();
     serializeJson(doc, message);
     webSocket.sendTXT(message);
     
-    Serial.println("[AUDIO] 📊 Statut audio mis à jour");
+    Serial.println("[AUDIO]  Statut audio mis à jour");
   }
 
   void sendAudioVolumeUpdate() {
@@ -1063,5 +1063,5 @@ void sendAudioVolumeUpdate();
     serializeJson(doc, message);
     webSocket.sendTXT(message);
     
-    Serial.println("[AUDIO] 📊 Volume mis à jour");
+    Serial.println("[AUDIO]  Volume mis à jour");
   }
