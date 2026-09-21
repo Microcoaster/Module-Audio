@@ -14,24 +14,17 @@ Comme les autres modules, il se configure au premier démarrage par portail capt
 
 Le module ne connaît pas le circuit. Il reçoit un nom de piste, la cherche sur la carte, la joue. C'est le contrôleur qui sait à quel moment du parcours un son doit partir.
 
-```
-Ordre reçu       nom de la piste à jouer
-Piste trouvée    décodage et sortie I2S vers l'amplificateur
-Piste absente    signalée au serveur, pas d'échec silencieux
-```
+<img src="docs/schemas/principe.png" alt="Ordre reçu : le contrôleur envoie le nom de la piste à jouer. Piste trouvée : décodage et sortie I2S vers le DAC puis l'amplificateur. Piste absente : signalée au serveur, un son muet et un module perdu se ressemblent trop pour qu'on les confonde." width="100%">
 
-Les fichiers se placent à la racine de la carte microSD. Une piste manquante est remontée explicitement : sur un circuit, un son qui ne part pas et un module qui ne répond plus se ressemblent trop pour qu'on les confonde.
+Les fichiers se placent à la racine de la carte microSD.
 
 <img src="docs/sections/s02.png" alt="02 Matériel" width="100%">
 
-| Élément | Rôle |
-|:--|:--|
-| ESP32 DevKit | Microcontrôleur |
-| Lecteur microSD | Stockage des pistes |
-| DAC I2S + amplificateur | Sortie audio |
-| Haut-parleur | Restitution |
+Deux bus cohabitent sur la carte. L'I2S porte le son vers le DAC, le SPI va chercher les fichiers sur la carte microSD. Les mélanger sur les mêmes broches est la première cause de lecture hachée.
 
-La sortie I2S est numérique jusqu'au DAC, ce qui évite de faire passer un signal analogique faible à côté des lignes de puissance des autres modules.
+<img src="docs/schemas/brochage.png" alt="Sortie audio sur bus I2S : GPIO 26 BCLK horloge de bit, GPIO 25 LRC sélection de voie, GPIO 22 DIN échantillons vers le DAC, GPIO 2 LED de statut lecture en cours. Stockage sur bus SPI : GPIO 13 SD CS sélection du lecteur, GPIO 23 MOSI données vers la carte, GPIO 19 MISO données depuis la carte, GPIO 18 SCK horloge du bus." width="100%">
+
+La sortie I2S reste numérique jusqu'au DAC, ce qui évite de faire courir un signal analogique faible à côté des lignes de puissance des autres modules.
 
 <img src="docs/sections/s03.png" alt="03 Protocole" width="100%">
 
