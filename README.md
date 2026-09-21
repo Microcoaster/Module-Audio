@@ -30,6 +30,8 @@ La sortie I2S reste numérique jusqu'au DAC, ce qui évite de faire courir un si
 
 Le module s'authentifie à la connexion, puis échange en JSON, comme les autres modules du circuit.
 
+<img src="docs/blocs/01.png" alt="JSON : identification, module vers serveur" width="100%">
+
 ```json
 {
   "type": "module_identify",
@@ -44,6 +46,8 @@ Le contrôleur envoie le nom de la piste à jouer, le module répond une fois la
 <img src="docs/sections/s04.png" alt="04 Mise en service" width="100%">
 
 Nécessite [PlatformIO](https://platformio.org/) dans Visual Studio Code.
+
+<img src="docs/blocs/02.png" alt="Terminal bash : compiler et téléverser" width="100%">
 
 ```bash
 pio run                  # compilation
@@ -60,6 +64,8 @@ pio device monitor       # console série, 115200 bauds
 Les identifiants WiFi restent en mémoire du module, jamais dans le dépôt.
 
 <img src="docs/sections/s05.png" alt="05 Écosystème" width="100%">
+
+<img src="docs/blocs/03.png" alt="Fichier platformio.ini : bibliothèques" width="100%">
 
 ```ini
 links2004/WebSockets        ; liaison avec le contrôleur
