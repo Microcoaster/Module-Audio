@@ -77,7 +77,7 @@ ayresnet/AyresWiFiManager   ; captive portal and reconnection
 
 Module under development: playback and the WebSocket link work, what remains is remote volume control and queueing several tracks.
 
-Embedded filesystem: **LittleFS**, which holds the portal pages. The common base for every module is the [WiFi Manager](https://github.com/Microcoaster/MicroCoaster_WifiManager), and the driving is done from the [WebApp](https://github.com/Microcoaster/MicroCoasterWebApp).
+Embedded filesystem: **LittleFS**, which holds the portal pages. The common base for every module is the [WiFi Manager](https://github.com/Microcoaster/MicroCoaster_WifiManager/blob/main/README.en.md), and the driving is done from the [WebApp](https://github.com/Microcoaster/MicroCoasterWebApp/blob/main/README.en.md).
 
 ---
 
